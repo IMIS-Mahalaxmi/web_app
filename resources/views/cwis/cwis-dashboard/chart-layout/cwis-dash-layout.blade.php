@@ -962,22 +962,28 @@ Developed By: Innovative Solution Pvt. Ltd. (ISPL)  (© ISPL, 2024) -->
 
     let url = "{{ url('fsm/nsd/push-nsd') }}/" + selectedYear;
 
+    // Disable the button and show a loading spinner
+    let $button = $(this);
+    $button.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Processing...');
+
     // Make an AJAX request to check and push data
     $.get(url, function(response) {
         if (response.error) {
             // Check for "published year" error and show it
             if (response.error.includes('already been published')) {
-                toastr.error(response.error); // Show error if the year is already published
+                toastr.error("CWIS Data for the year " + selectedYear + " has already been published. Please contact the system administrator if you need assistance.");
             } else {
-                toastr.error(response.error); // Show other errors
+                toastr.error(response.error);
             }
+            $button.prop('disabled', false).html('Push NSD'); // Re-enable button
         } else {
             setTimeout(function () {
                 window.location.href = url;
             });
         }
     }).fail(function() {
-        toastr.error("Cannot Push Data in Published Year.");
+        toastr.error("An error occurred while processing the CWIS data for the year " + selectedYear + ". Please try again.");
+        $button.prop('disabled', false).html('Push CWIS Indicator to NSD'); // Re-enable button
     });
 });
 
