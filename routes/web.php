@@ -259,6 +259,12 @@ Route::group([
     'namespace' => 'Fsm'
 ], function () {
 
+    Route::post('/nsd/authenticate', 'NsdDashboardController@getBearerToken');
+    Route::get('/nsd/push-nsd/{year}', 'NsdDashboardController@pushToNsd');
+    Route::get('/nsd/cwis-data/{year}', 'NsdDashboardController@getCwisData');
+    Route::get('/nsd/cwis-status/{year}', 'NsdDashboardController@checkNsdStatus');
+
+    
     Route::get('/cwis-setting/data', 'CwisSettingController@getData');
     Route::resource('/cwis-setting', 'CwisSettingController');
 

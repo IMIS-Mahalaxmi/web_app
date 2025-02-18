@@ -375,6 +375,8 @@ Developed By: Innovative Solution Pvt. Ltd. (ISPL)  (© ISPL, 2024) -->
         </select>
     </div>
     <div class="buttons-container">
+        <button class="export-button" style="margin-right:none" id="nsd-push">Push CWIS Indicator to NSD</button>
+        <button class="export-button" style="margin-right:none" id="nsd-status">Check Status of Indicator in NSD</button>
         <button class="export-button" style="margin-right:none" id="export">{{__("Export to Excel")}}</button>
         <button class="pdf">{{__("Generate PDF")}}</button>
     </div>
@@ -948,6 +950,91 @@ Developed By: Innovative Solution Pvt. Ltd. (ISPL)  (© ISPL, 2024) -->
 
         document.querySelector('.pdf').addEventListener('click', downloadPDF);
     });
+
+    $('#nsd-push').on('click', function (e) {
+    e.preventDefault();
+
+    let selectedYear = $('#cwis-year-select').val();
+    if (!selectedYear) {
+        toastr.error("Please select a year first.");
+        return;
+    }
+
+    let url = "{{ url('fsm/nsd/push-nsd') }}/" + selectedYear;
+
+    // Make an AJAX request to check and push data
+    $.get(url, function(response) {
+        if (response.error) {
+            // Check for "published year" error and show it
+            if (response.error.includes('already been published')) {
+                toastr.error(response.error); // Show error if the year is already published
+            } else {
+                toastr.error(response.error); // Show other errors
+            }
+        } else {
+            setTimeout(function () {
+                window.location.href = url;
+            });
+        }
+    }).fail(function() {
+        toastr.error("Cannot Push Data in Published Year.");
+    });
+});
+
+
+
+   $('#nsd-status').on('click', function (e) {
+    e.preventDefault();
+    let selectedYear = $('#cwis-year-select').val();
+    if (!selectedYear) {
+        toastr.error("Please select a year first.");
+        return;
+    }
+
+    let url = "{{ url('fsm/nsd/cwis-status') }}/" + selectedYear;
+
+    $.ajax({
+        url: url,
+        type: "GET",
+        dataType: "json",
+        success: function (response) {
+            console.log(response);
+
+            if (Array.isArray(response) && response.length > 0) {
+                let data = response[0]; 
+                let publishedYears = data.published_years || [];
+                let draftYears = data.draft_years || [];
+                let city = data.city || "None";
+
+                Swal.fire({
+                    title: 'CWIS Status of Published and Draft Years',
+                    html: `<p><strong>City:</strong> ${city}</p>
+                        <p><strong>Published Years:</strong> ${publishedYears.length ? publishedYears.join(", ") : "None"}</p>
+                           <p><strong>Draft Years:</strong> ${draftYears.length ? draftYears.join(", ") : "None"}</p>`,
+                    icon: 'info',
+                    confirmButtonText: 'OK'
+                });
+            } else {
+                Swal.fire({
+                    title: 'Error',
+                    text: "Failed to fetch year information.",
+                    icon: 'warning',
+                    confirmButtonText: 'OK'
+                });
+            }
+        },
+        error: function (xhr, status, error) {
+            console.error(xhr.responseText);
+            Swal.fire({
+                title: 'Error',
+                text: "An error occurred while fetching year information.",
+                icon: 'warning',
+                confirmButtonText: 'OK'
+            });
+        }
+    });
+});
+
 </script>
 
 @endif
