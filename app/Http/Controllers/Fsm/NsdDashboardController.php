@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Fsm;
 
+use Illuminate\Support\Facades\Crypt;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Cwis\cwis_mne;
+use App\Models\Fsm\Nsd;
 
 class NsdDashboardController extends Controller
 {
@@ -16,15 +18,19 @@ class NsdDashboardController extends Controller
     private $password;
     private $apiLoginUrl;
     private $apiPostUrl;
-    private $city;
+    private $city_db;
 
     public function __construct()
     {
-        $this->email = env('nsd_username');
-        $this->password = env('nsd_password');
-        $this->apiLoginUrl = env('API_LOGIN_URL');
-        $this->apiPostUrl = env('API_POST_URL');
-        $this->city = env('city');
+        $this->email = NSD::pluck('nsd_username')->first();
+        $this->password = NSD::pluck('nsd_password')->first();
+        $this->city_db = NSD::pluck('city')->first();
+        $this->apiLoginUrl = NSD::pluck('api_login_url')->first();
+        $this->apiPostUrl = NSD::pluck('api_post_url')->first();
+        if ($this->password) {
+            $this->password = Crypt::decryptString($this->password);
+            $this->password = unserialize($this->password);
+        }
     }
 
     public function pushToNsd($year)
@@ -40,15 +46,15 @@ class NsdDashboardController extends Controller
         }
 
         // Get authentication token for NSD
-        $bearerToken = $this->getBearerToken();
+        $bearerToken = $this->getBearerToken($this->password);
         if (empty($bearerToken)) {
             return redirect()->back()->with('error', 'Failed to retrieve authentication token.');
         }
 
         // Fetch all published years and check if the selected year is already published
-        $publishedYears = $this->checkNsdStatus();
+        $publishedYears = $this->checkNsdStatus($this->city_db);
         if (isset($publishedYears['error'])) {
-            return redirect()->back()->with('error', 'Failed to retrieve published years.');
+            return redirect()->back()->with('error', 'Failed to push CWIS Data to NSD.');
         }
 
         if (in_array($year, $publishedYears)) {
@@ -72,44 +78,48 @@ class NsdDashboardController extends Controller
     }
 
 
-    public function getBearerToken()
-    { 
+    public function getBearerToken($credentials = null)
+    {   
+       
         try {
             if (!empty($this->bearerToken)) {
                 return $this->bearerToken;
             }
+            $email = $credentials['nsd_username'] ?? $this->email;
+            $password = $credentials['nsd_password'] ?? $this->password;
+            $apiLoginUrl = $credentials['api_login_url'] ?? $this->apiLoginUrl;
 
             if (empty($this->email) || empty($this->password) || empty($this->apiLoginUrl)) {
                 throw new \Exception("Missing required configuration for authentication.");
             }
+            // Proceed with authentication logic
             $client = new Client([
-                'base_uri' => $this->apiLoginUrl,
+                'base_uri' => $apiLoginUrl,
                 'headers' => [
                     'Accept' => 'application/json',
                     'Content-Type' => 'application/json',
                 ],
             ]);
-           
+
             $rawData = json_encode([
-                'email' => $this->email,
-                'password' => $this->password,
+                'email' => $email,
+                'password' => $password,
                 'grant_type' => 'password',
             ]);
             $response = $client->post('api/v1/auth/authenticate', [
-                'body' => $rawData, // Send the raw data here
+                'body' => $rawData,
             ]);
 
-            $responseData = json_decode($response->getBody(), true);
-            $this->bearerToken = $responseData['access_token']; // Store token for future use
-           
+            $responseData = json_decode((string) $response->getBody(), true);
+            $this->bearerToken = $responseData['access_token'];
+
             return $this->bearerToken;
         } catch (\Exception $e) {
-            // Log the error
             \Log::error('Error fetching bearer token: ' . $e->getMessage());
-            return null; // Return null or a default error message
+            return null;
         }
-    } 
-  
+    }
+
     public function getCwisData($year)
     {   
         try {
@@ -128,7 +138,7 @@ class NsdDashboardController extends Controller
     {
         $year = (integer)$year;
         $cwis_post_data = [
-               "city"=> $this->city,
+               "city"=> $this->city_db,
                 "year"=> $year,
                 "indicators"=> $cwis
         ];
@@ -155,12 +165,11 @@ class NsdDashboardController extends Controller
         return $responseData;
     }
 
-    public function checkNsdStatus()
+    public function checkNsdStatus($city = null)
     {
         try {
-            $token = $this->getBearerToken();
-
-            // Check if token retrieval was successful
+           
+            $token = $this->getBearerToken($this->password);
             if (!$token) {
                 throw new \Exception("Failed to retrieve bearer token.");
             }
@@ -176,11 +185,12 @@ class NsdDashboardController extends Controller
                 ],
             ]);
 
-            $cities = is_array($this->city) ? $this->city : [$this->city];
-            $publishedYears = [];
-            
-            // Loop through each city and make an API request
-            foreach ($cities as $city) {
+            if ($city == null){
+                $city = $this->city_db;
+            }
+            $cities = is_array($city) ? $city : [$city];
+
+            foreach ($cities as $city) {    
                 $response = $client->get('api/v1/imis/indicators/metadata', [
                     'query' => [
                         'city' => $city,
@@ -188,16 +198,21 @@ class NsdDashboardController extends Controller
                         'draft_year' => "",
                     ],
                 ]);
-                
-                // Decode the response body
+
                 $responseData = json_decode($response->getBody(), true);
-                return $responseData;
+
+                // Filter out only the object(s) matching the selected city
+                $filteredData = array_filter($responseData, function ($item) use ($city) {
+                    return isset($item['city']) && $item['city'] === $city;
+                });
+
+                // Re-index array keys after filtering
+                $filteredData = array_values($filteredData);
+                
+                return $filteredData;
             }
 
-            // Log the published years for debugging2
-            \Log::info('Published Years: ', $publishedYears);
-
-            return $publishedYears;  // Return only the published years
+            return []; // In case no city is found
         } catch (\Exception $e) {
             \Log::error('Error fetching NSD status: ' . $e->getMessage());
             return ['error' => 'Failed to fetch NSD status.'];
