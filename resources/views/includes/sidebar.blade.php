@@ -347,9 +347,10 @@ Developed By: Innovative Solution Pvt. Ltd. (ISPL)   -->
 
             </li>
             @endif
-            @if(Auth::user()->hasanyPermissionInGroup(['CWIS','KPI Dashboard','KPI Target']) || Auth::user()->hasRole('Super Admin'))
-            <li class="nav-item {{ request()->is('cwis/*', 'fsm/kpi-dashboard', 'fsm/kpi-targets/*','fsm/kpi-targets','fsm/cwis-setting/*','fsm/cwis-setting') ? 'menu-is-opening menu-open' : '' }}">
-                <a href="" class="nav-link {{ request()->is('cwis/*', 'fsm/kpi-dashboard', 'fsm/kpi-targets/*','fsm/kpi-targets','fsm/cwis-setting/*','fsm/cwis-setting') ? 'active' : '' }}">
+            @if(Auth::user()->hasanyPermissionInGroup(['CWIS','KPI Dashboard','KPI Target','NSD Setting']) || Auth::user()->hasRole('Super Admin'))
+            <li class="nav-item {{ request()->is('cwis/*', 'fsm/kpi-dashboard', 'fsm/kpi-targets/*','fsm/kpi-targets','fsm/cwis-setting/*','fsm/cwis-setting', 
+                'fsm/nsd-setting','fsm/nsd-setting/*') ? 'menu-is-opening menu-open' : '' }}">
+                <a href="" class="nav-link {{ request()->is('cwis/*', 'fsm/kpi-dashboard', 'fsm/kpi-targets/*','fsm/kpi-targets','fsm/cwis-setting/*','fsm/cwis-setting', 'fsm/nsd-setting', 'fsm/nsd-setting/*') ? 'active' : '' }}">
                 <img src="{{ asset('img/svg/imis-icons/cwis.svg')}}" class="nav-icon" alt="CWIS  Icon">
                     <p> {{__('CWIS IMS')}}<i class="right fas fa-angle-left"></i> </p>
                 </a>
@@ -376,6 +377,16 @@ Developed By: Innovative Solution Pvt. Ltd. (ISPL)   -->
                     </li>
                     @endcan
 
+                    @if(Auth::user()->hasanyPermissionInGroup(['KPI Dashboard']) || Auth::user()->hasRole('Super Admin'))
+                    @can('LisT NSD Setting')
+                    <li class="nav-item">
+                        <a href="{{ action('Fsm\NsdSettingController@index') }}" class="nav-link {{ request()->is('fsm/nsd-setting','fsm/nsd-setting/*') ? 'active' : '' }}">
+                        <i class="nav-icon fa-solid fa-gear "style="font-size: 14px;"></i>
+                            <p>NSD Setting</p>
+                        </a>
+                    </li>
+                    @endcan
+                    
                     @if(Auth::user()->hasanyPermissionInGroup(['KPI Dashboard']) || Auth::user()->hasRole('Super Admin'))
                     <li class="nav-item">
                             <a href="{{ action('Fsm\KpiDashboardController@index') }}" class="nav-link {{ request()->is('fsm/kpi-dashboard') ? 'active' : '' }}">
