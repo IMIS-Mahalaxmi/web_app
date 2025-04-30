@@ -20,7 +20,7 @@
     <div class="form-group row required">
 		{!! Form::label('nsd_username','Username',['class' => 'col-sm-3 control-label']) !!}
 		<div class="col-sm-3">
-			{!! Form::text('nsd_username',null,['class' => 'form-control', 'placeholder' => 'Username']) !!}
+			{!! Form::text('nsd_username',null,['class' => 'form-control', 'placeholder' => 'Username','autocomplete' => 'off']) !!}
 		</div>
 	</div>
     <div class="form-group row required">
@@ -29,7 +29,7 @@
 			@if(isset($nsd))
 				{!! Form::hidden('current_password', $nsd->nsd_password) !!}
 			@endif
-			{!! Form::password('nsd_password', ['class' => 'form-control', 'placeholder' => 'Password']) !!}
+			{!! Form::password('nsd_password', ['class' => 'form-control', 'placeholder' => 'Password', 'autocomplete' => 'off']) !!}
 		</div>
 	</div>
 </div>
