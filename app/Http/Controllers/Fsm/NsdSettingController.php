@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Fsm;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Models\Fsm\NSD;
+use App\Models\Fsm\Nsd;
 use Illuminate\Support\Facades\Crypt;
 use App\Http\Controllers\Fsm\NsdDashboardController;
 
@@ -12,7 +12,7 @@ class NsdSettingController extends Controller
 {
     public function index()
     {
-        $nsd = NSD::first();
+        $nsd = Nsd::first();
         if (!$nsd) {
             return redirect()->route('nsd-setting.create');
         }
