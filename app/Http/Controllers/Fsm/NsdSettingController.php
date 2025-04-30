@@ -36,10 +36,18 @@ class NsdSettingController extends Controller
     {
         $data = $request->validate([
             'nsd_username' => 'required|string',
-            'nsd_password' => 'nullable|string',
+            'nsd_password' => 'required|string',
             'city' => 'required|string',
             'api_post_url' => 'required|url',
             'api_login_url' => 'required|url',
+        ], [
+            'nsd_username.required' => 'The Username is required.',
+            'nsd_password.required' => 'The Password is required.',
+            'city.required' => 'The City is required.',
+            'api_post_url.required' => 'The URL TO Send Data is required.',
+            'api_post_url.url' => 'The URL TO Send Data must be a valid URL.',
+            'api_login_url.required' => 'The URL To Authenticate is required.',
+            'api_login_url.url' => 'The URL To Authenticate must be a valid URL.',
         ]);
 
         $nsd = NSD::create([
@@ -93,10 +101,18 @@ class NsdSettingController extends Controller
 
         $data = $request->validate([
             'nsd_username' => 'required|string',
-            'nsd_password' => 'nullable|string',
-            'city'         => 'required|string',
+            'nsd_password' => 'required|string',
+            'city' => 'required|string',
             'api_post_url' => 'required|url',
             'api_login_url' => 'required|url',
+        ], [
+            'nsd_username.required' => 'The Username is required.',
+            'nsd_password.required' => 'The Password is required.',
+            'city.required' => 'The City is required.',
+            'api_post_url.required' => 'The URL TO Send Data is required.',
+            'api_post_url.url' => 'The URL TO Send Data must be a valid URL.',
+            'api_login_url.required' => 'The URL To Authenticate is required.',
+            'api_login_url.url' => 'The URL To Authenticate must be a valid URL.',
         ]);
 
         $nsd = NSD::findOrFail($id);
