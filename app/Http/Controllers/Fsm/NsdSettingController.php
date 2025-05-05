@@ -73,10 +73,9 @@ class NsdSettingController extends Controller
                 ->with('error', 'Invalid credentials. Bearer token verification failed.');
         }
 
-
         $city = $data['city'];
         $checkStatus = $dashboardController->checkNsdStatus($city);
-
+       
         if (!$checkStatus) {
             return redirect()->back()
                 ->withInput($request->all())
@@ -101,13 +100,11 @@ class NsdSettingController extends Controller
 
         $data = $request->validate([
             'nsd_username' => 'required|string',
-            'nsd_password' => 'required|string',
             'city' => 'required|string',
             'api_post_url' => 'required|url',
             'api_login_url' => 'required|url',
         ], [
             'nsd_username.required' => 'The Username is required.',
-            'nsd_password.required' => 'The Password is required.',
             'city.required' => 'The City is required.',
             'api_post_url.required' => 'The URL TO Send Data is required.',
             'api_post_url.url' => 'The URL TO Send Data must be a valid URL.',
@@ -120,6 +117,7 @@ class NsdSettingController extends Controller
         $credentials = [
             'nsd_username' => $data['nsd_username'],
             'nsd_password' => !empty($data['nsd_password']) ? $data['nsd_password'] : Crypt::decrypt($nsd->nsd_password),
+            'api_login_url' => $data['api_login_url'],
         ];
 
         $dashboardController = new NsdDashboardController();
@@ -128,16 +126,18 @@ class NsdSettingController extends Controller
         if (!$bearerToken) {
             return redirect()->back()
                 ->withInput($request->all())
-                ->with('error', 'Invalid credentials. Bearer token verification failed.');
+                ->with('error', 'Invalid Credentials or Authentication Url.');
         }
 
-        $city = $data['city'];
-        $checkStatus = $dashboardController->checkNsdStatus($city);
-      
-        if (!$checkStatus) {
+        $checkStatus = $dashboardController->checkNsdStatus(
+            $data['city'],
+            $data['api_post_url']
+        );
+
+        if (!($checkStatus) || isset($checkStatus['error'])) {
             return redirect()->back()
                 ->withInput($request->all())
-                ->with('error', 'NSD status check failed. Unable to verify the NSD status.');
+                ->with('error', 'Invalid City or Send Data Url.');
         }
        
         // Save the data if both checks pass

@@ -979,7 +979,7 @@ Developed By: Innovative Solution Pvt. Ltd. (ISPL)  (© ISPL, 2024) -->
             });
         }
     }).fail(function() {
-        toastr.error("CWIS Data for the year " + selectedYear + " has already been published.");
+        toastr.error("CWIS Data Could Not be Pushed. Please Check Status of Indicator in NSD");
         $button.prop('disabled', false).html('Push CWIS Indicator to NSD'); // Re-enable button
     });
 });
