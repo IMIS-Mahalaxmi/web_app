@@ -963,7 +963,7 @@ Developed By: Innovative Solution Pvt. Ltd. (ISPL)  (© ISPL, 2024) -->
         return;
     }
 
-    let url = "{{ url('fsm/nsd/push-nsd') }}/" + selectedYear;
+    let url = "{{ secure_url('fsm/nsd/push-nsd') }}/" + selectedYear;
 
     // Disable the button and show a loading spinner
     let $button = $(this);
@@ -994,7 +994,7 @@ Developed By: Innovative Solution Pvt. Ltd. (ISPL)  (© ISPL, 2024) -->
         return;
     }
 
-    let url = "{{ url('fsm/nsd/cwis-status') }}"  ;
+    let url = "{{ secure_url('fsm/nsd/cwis-status') }}"  ;
 
     $.ajax({
         url: url,
