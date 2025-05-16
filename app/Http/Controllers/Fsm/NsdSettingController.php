@@ -21,13 +21,13 @@ class NsdSettingController extends Controller
 
     public function create()
     {   
-        $page_title = 'National Sanitation Dashboard (NSD) Credentials';
+        $page_title = 'National Sanitation Dashboard Integration Settings';
         return view('fsm.nsd-setting.create', compact('page_title'));
     }
 
     public function edit($id)
     {
-        $page_title = 'National Sanitation Dashboard (NSD) Credentials';
+        $page_title = 'National Sanitation Dashboard Integration Settings';
         $nsd= NSD::findOrFail($id);
         return view('fsm.nsd-setting.edit', compact('nsd', 'page_title'));
     }
@@ -45,7 +45,7 @@ class NsdSettingController extends Controller
             'nsd_password.required' => 'The Password is required.',
             'city.required' => 'The City is required.',
             'api_post_url.required' => 'The URL TO Send Data is required.',
-            'api_post_url.url' => 'The URL TO Send Data must be a valid URL.',
+            'api_post_url.url' => 'The URL To Send Data must be a valid URL.',
             'api_login_url.required' => 'The URL To Authenticate is required.',
             'api_login_url.url' => 'The URL To Authenticate must be a valid URL.',
         ]);
@@ -106,8 +106,8 @@ class NsdSettingController extends Controller
         ], [
             'nsd_username.required' => 'The Username is required.',
             'city.required' => 'The City is required.',
-            'api_post_url.required' => 'The URL TO Send Data is required.',
-            'api_post_url.url' => 'The URL TO Send Data must be a valid URL.',
+            'api_post_url.required' => 'The URL To Send Data is required.',
+            'api_post_url.url' => 'The URL To Send Data must be a valid URL.',
             'api_login_url.required' => 'The URL To Authenticate is required.',
             'api_login_url.url' => 'The URL To Authenticate must be a valid URL.',
         ]);
