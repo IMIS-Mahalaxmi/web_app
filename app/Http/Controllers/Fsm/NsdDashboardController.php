@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Fsm;
 use Illuminate\Support\Facades\Crypt;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\ClientException;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Cwis\cwis_mne;
@@ -48,14 +50,14 @@ class NsdDashboardController extends Controller
         // Get authentication token for NSD
         $bearerToken = $this->getBearerToken($this->password);
         if (empty($bearerToken)) {
-            return redirect()->back()->with('error', 'Failed to retrieve Authentication token.Please Check your Credentials.');
+            return redirect()->back()->with('error', 'Login to NSD failed. Please Check your NSD Integration Setting.');
         }
 
         // Fetch all published years and check if the selected year is already published
         $publishedYears = $this->checkNsdStatus($this->city_db);       
         if (!empty($publishedYears) && isset($publishedYears[0]['published_years'])) {
             if (in_array($year, $publishedYears[0]['published_years'])) {
-                return redirect()->back()->with('error', "CWIS data for the selected year $year has already been published.");
+                return redirect()->back()->with('error', "Data for the selected year $year has already been published.");
             }
         }
 
@@ -64,12 +66,12 @@ class NsdDashboardController extends Controller
         if (empty($cwis)) {
             return redirect()->back()->with('error', 'Failed to retrieve CWIS data for the selected year.');
         }
-
+        
         $response = $this->postToNSD($cwis, $year);
 
         // Handle API response
         if (isset($response['error'])) {
-            return redirect()->back()->with('error', 'Failed to push CWIS data to NSD.');
+            return redirect()->back()->with('error', $response['error']);
         }
 
         return redirect()->back()->with('success', "CWIS data for year $year pushed successfully to NSD! Please use the 'Check Status' button to verify the status.");
@@ -141,32 +143,43 @@ class NsdDashboardController extends Controller
                 "indicators"=> $cwis
         ];
         // Initialize the HTTP client
-        $client = new Client([
-            'base_uri' => $this->apiPostUrl,
-            'headers' => [
-                'Accept' => 'application/json',
-                'Content-Type' => 'application/json', // Specify content type
-                'Authorization' => 'Bearer ' . trim($this->bearerToken),
-                'X-Requested-With' => 'XMLHttpRequest', // Common header to test
-                'Content-Length' => strlen(json_encode($cwis_post_data)),  // Add content length header
-                'Host' => parse_url($this->apiPostUrl, PHP_URL_HOST),
-            ],
-        ]);
-       
-        $response = $client->post('api/v1/imis/indicators', [
-            'body' => json_encode($cwis_post_data), // Send the raw data here
-        ]);
+        try {
+            $client = new Client([
+                'base_uri' => $this->apiPostUrl,
+                'headers' => [
+                    'Accept' => 'application/json',
+                    'Content-Type' => 'application/json',
+                    'Authorization' => 'Bearer ' . trim($this->bearerToken),
+                ],
+                'timeout' => 10,
+            ]);
 
-        $responseData = json_decode($response->getBody(), true);
-        \Log::error('Error fetching bearer token: ' . $responseData);
+            $response = $client->post('api/v1/imis/indicators', [
+                'body' => json_encode($cwis_post_data),
+            ]);
 
-        return $responseData;
+            $responseData = json_decode($response->getBody(), true);
+            return $responseData;
+        } catch (ConnectException $e) {
+            return ['error' => 'NSD Service not available, Please Check with your IT Admin.'];
+        } catch (ClientException $e) {
+
+            $status = $e->getResponse()->getStatusCode();
+            if ($status == 401) {
+                return ['error' => 'Selected City Not found. Please check your NSD Integration Setting.'];
+            } else {
+                return ['error' => "Client error occurred (HTTP $status). Please check the request."];
+            }
+        } catch (RequestException $e) {
+            // Other errors (fallback)
+            return ['error' => 'Request error: ' . $e->getMessage()];
+        }
     }
 
     public function checkNsdStatus($city = null, $apiPostUrl = null)
 {
     try {
-        $token = $this->getBearerToken($this->password); // KEEP this line unchanged!
+        $token = $this->getBearerToken($this->password); 
 
         if (!$token) {
             throw new \Exception("Failed to retrieve bearer token.");

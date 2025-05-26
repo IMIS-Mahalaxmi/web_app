@@ -376,10 +376,11 @@ Developed By: Innovative Solution Pvt. Ltd. (ISPL)  (© ISPL, 2024) -->
     </div>
     <div class="buttons-container">
         @can('Push CWIS Indicator to NSD')
-        <button class="export-button" style="margin-right:none" id="nsd-push">Push CWIS Indicator to NSD</button>
+        <button class="export-button" style="margin-right:none" id="nsd-push">Push Data to NSD</button>
         @endcan
         @can('Check Status of Indicator in NSD')
-        <button class="export-button" style="margin-right:none" id="nsd-status">Check Status of Indicator in NSD</button>
+        <button class="export-button" style="margin-right:none" id="nsd-status">Check Publication status in NSD</button>
+        @endcan
         <button class="export-button" style="margin-right:none" id="export">{{__("Export to Excel")}}</button>
         <button class="pdf">{{__("Generate PDF")}}</button>
     </div>
@@ -963,7 +964,7 @@ Developed By: Innovative Solution Pvt. Ltd. (ISPL)  (© ISPL, 2024) -->
         return;
     }
 
-    let url = "{{ secure_url('fsm/nsd/push-nsd') }}/" + selectedYear;
+    let url = "{{ url('fsm/nsd/push-nsd') }}/" + selectedYear;
 
     // Disable the button and show a loading spinner
     let $button = $(this);
@@ -978,9 +979,9 @@ Developed By: Innovative Solution Pvt. Ltd. (ISPL)  (© ISPL, 2024) -->
                 window.location.href = url;
             });
         }
-    }).fail(function() {
-        toastr.error("CWIS Data Could Not be Pushed. Please Check Status of Indicator in NSD");
-        $button.prop('disabled', false).html('Push CWIS Indicator to NSD'); // Re-enable button
+    }).fail(function(jqXHR, textStatus, errorThrown) {
+      toastr.error("CWIS Data Could Not be Pushed. Please Check NSD Integration Settings");
+      $button.prop('disabled', false).html('Push CWIS Indicator to NSD'); // Re-enable button
     });
 });
 
@@ -994,14 +995,14 @@ Developed By: Innovative Solution Pvt. Ltd. (ISPL)  (© ISPL, 2024) -->
         return;
     }
 
-    let url = "{{ secure_url('fsm/nsd/cwis-status') }}"  ;
+    let url = "{{ url('fsm/nsd/cwis-status') }}" ;
 
     $.ajax({
         url: url,
         type: "GET",
         dataType: "json",
         success: function (response) {
-            console.log(response);
+            console.log(response);            
 
             if (Array.isArray(response) && response.length > 0) {
                 let data = response[0]; 
@@ -1017,24 +1018,12 @@ Developed By: Innovative Solution Pvt. Ltd. (ISPL)  (© ISPL, 2024) -->
                     icon: 'info',
                     confirmButtonText: 'OK'
                 });
-            } else {
-                let data = response;
-                let city = data.city;
-                Swal.fire({
-                    title: 'CWIS Status of Published and Draft Years',
-                    html: `<p><strong>City:</strong> ${city}</p>
-                        <p><strong>Published Years:</strong> None</p>
-                           <p><strong>Draft Years:</strong> None</p>`,
-                    icon: 'info',
-                    confirmButtonText: 'OK'
-                });
-            }
+            } 
         },
         error: function (xhr, status, error) {
-            console.error(xhr.responseText);
             Swal.fire({
                 title: 'Error',
-                text: "An error occurred while fetching year information.",
+                text: "Unable to retrieve year data from NSD. Please verify your NSD integration settings",
                 icon: 'warning',
                 confirmButtonText: 'OK'
             });

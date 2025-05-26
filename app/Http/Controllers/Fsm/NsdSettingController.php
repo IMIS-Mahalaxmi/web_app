@@ -70,7 +70,7 @@ class NsdSettingController extends Controller
         if (!$bearerToken) {
             return redirect()->back()
                 ->withInput($request->all())
-                ->with('error', 'Invalid credentials. Bearer token verification failed.');
+                ->with('error', 'Invalid username, password, or URL For Authentication.');
         }
 
         $city = $data['city'];
@@ -79,7 +79,7 @@ class NsdSettingController extends Controller
         if (!$checkStatus) {
             return redirect()->back()
                 ->withInput($request->all())
-                ->with('error', 'NSD status check failed. Unable to verify the NSD status.');
+                ->with('error', 'Invalid City or URL To Send Data.');
         }
 
         // Save the data if both checks pass
@@ -126,7 +126,7 @@ class NsdSettingController extends Controller
         if (!$bearerToken) {
             return redirect()->back()
                 ->withInput($request->all())
-                ->with('error', 'Invalid Credentials or Authentication Url.');
+                ->with('error', 'Invalid Username, Password, or URL For Authentication.');
         }
 
         $checkStatus = $dashboardController->checkNsdStatus(
@@ -137,7 +137,7 @@ class NsdSettingController extends Controller
         if (!($checkStatus) || isset($checkStatus['error'])) {
             return redirect()->back()
                 ->withInput($request->all())
-                ->with('error', 'Invalid City or Send Data Url.');
+                ->with('error', 'Invalid City or URL To Send Data.');
         }
        
         // Save the data if both checks pass
