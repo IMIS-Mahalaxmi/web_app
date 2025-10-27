@@ -26,7 +26,7 @@ Developed By: Innovative Solution Pvt. Ltd. (ISPL)   -->
         <div class="container d-flex justify-content-center justify-content-md-between">
             <div class="contact-info d-flex align-items-center">
                 <div class="d-flex p-4">
-                    <i class="fas fa-envelope d-flex align-items-center"></i> 
+                    <i class="fas fa-envelope d-flex align-items-center"></i>
                     <span class="p-2">imis@ait.asia</span>
                 </div>
 
@@ -41,7 +41,8 @@ Developed By: Innovative Solution Pvt. Ltd. (ISPL)   -->
     <!-- ======= Header ======= -->
     <header id="header" class="d-flex align-items-center">
         <div class="container d-flex align-items-center justify-content-between">
-            <a href="{{URL::to('/')}}" class="logo"><img src="{{ asset('img/logo-imis.png') }}" alt="IMIS LOGO" /></a>
+            <a href="{{URL::to('/')}}" class="logo"><img src="{{ asset('img/Mahalaxmilogo.png') }}" alt="IMIS LOGO" /></a>
+            <h4 style="margin-left: 1rem;margin-bottom: 0;">Mahalaxmi Municipality<br> Lalitpur</h4>
 
             <nav id="navbar" class="navbar-landing">
                 <ul>
@@ -49,6 +50,7 @@ Developed By: Innovative Solution Pvt. Ltd. (ISPL)   -->
                     <li><a class="nav-link scrollto" href="#about">About</a></li>
                     <li><a class="nav-link scrollto" href="#cwis">CWIS</a></li>
                     <li><a class="nav-link scrollto" href="#features">Features</a></li>
+                    <li><a class="nav-link scrollto" href="#activities">Activities</a></li>
                     <li><a class="nav-link scrollto" href="#services">Functional Modules</a></li>
                     <li><a class="nav-link scrollto" href="#contact">Contact</a></li>
                     <li>
@@ -158,6 +160,25 @@ Developed By: Innovative Solution Pvt. Ltd. (ISPL)   -->
             </div>
         </section>
         <!-- End Feature Section -->
+        {{-- Activities Section --}}
+        <section id="activities" id = "activities" class="activities section-bg">
+            <div class="container" data-aos="fade-up">
+                  <div class="section-title">
+                      <h2>Activities</h2>
+                      <h3>Activities of <span>IMIS</span></h3>
+                  </div>
+            </div>
+
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-4">
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        {{-- End Activities Section --}}
 
         <!-- ======= Services Section ======= -->
         <section id="services" class="service">
@@ -419,19 +440,21 @@ Developed By: Innovative Solution Pvt. Ltd. (ISPL)   -->
                             <div class="address">
                                 <i class="fas fa-map-marker-alt"></i>
                                 <h4>Location:</h4>
-                                <p></p>
+                                <p>महालक्ष्मी नगरपालिका नगर कार्यपालिकाको कार्यालय
+                                    कमलपोखरी, ललितपुर बागमती प्रदेश, नेपाल
+                            </p>
                             </div>
 
                             <div class="email">
                                 <i class=" icon far fa-envelope"></i>
                                 <h4>Email:</h4>
-                                <p>imis@ait.asia</p>
+                                <p>info@mahalaxmimun.gov.np</p>
                             </div>
 
                             <div class="phone">
                                 <i class="fas fa-mobile-alt"></i>
                                 <h4>Call:</h4>
-                                <p></p>
+                                <p>०१–५२०३५९२, ०१–५२०१६३३, ०१–५२०१७३३</p>
                             </div>
 
                         </div>
@@ -474,7 +497,7 @@ Developed By: Innovative Solution Pvt. Ltd. (ISPL)   -->
         <div class="container py-4">
         <div class="copyright">
         <strong> Base IMIS <i class="fa-regular fa-copyright"> </i>  2022-{{ \Carbon\Carbon::now()->format('Y') }} by <a href="http://www.innovativesolution.com.np">
-            ISPL</a> & <a href="https://www.gwsc.ait.ac.th/">GWSC-AIT</a> is licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/?ref=chooser-v1">CC BY-NC-SA 4.0 </a>
+            Innovative Solution Pvt. Ltd.</a> & <a href="https://www.gwsc.ait.ac.th/">Global Water & Sanitation Center-Asian Institute of Technology (GWSC-AIT)</a> is licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/?ref=chooser-v1">CC BY-NC-SA 4.0 </a>
 </strong>
     </div>
             <div class="credits">

@@ -74,7 +74,7 @@ class UsersTableSeeder extends Seeder
         ]);
 
         $buildingpermit->assignRole('Municipality - Building Permit Department');
-        
+
         $surveyor = User::create ([
             'name' => 'Building Surveyor',
             'gender' => '',
@@ -151,6 +151,17 @@ class UsersTableSeeder extends Seeder
         ]);
 
         $solid_waste->assignRole('Municipality - Solid Waste Management Department');
+
+        $map_viewer = User::create ([
+            'name' => 'Map Viewer',
+            'gender' => '',
+            'username' => 'mapviewer',
+            'email' => 'mapviewer@gmail.com',
+            'password' => bcrypt('Mapviewer@2024'),
+            'user_type' => 'Municipality',
+        ]);
+
+        $map_viewer->assignRole('Municipality - Map Viewer');
 
         // $help_desk = User::create ([
         //     'name' => 'Municipality - Help Desk',
@@ -234,7 +245,7 @@ class UsersTableSeeder extends Seeder
         ]);
         $guest->assignRole('Guest');
 
-      
+
     }
 
 
