@@ -10,11 +10,18 @@ Developed By: Innovative Solution Pvt. Ltd. (ISPL)   -->
         </span>
     </a>
     @else
-    <a href="{{ url('/') }}" class="brand-link" id="sidebar-brand-link">
+    {{-- <a href="{{ url('/') }}" class="brand-link" id="sidebar-brand-link">
         <img src="{{ asset('/img/logo-imis.png') }}" alt="Municipality Logo" id="sidebar-logo" style="filter: brightness(0) invert(1) grayscale(1); float:left; line-height: .8;
         margin-right: 0.5rem; margin-top:3px; max-height:33px; width:70px">
         <img src="{{ asset('/img/logo-imis.png') }}" alt=" Municipality Logo" id="hello-text" style="filter: brightness(0) invert(1) grayscale(1); float:left; line-height : .8;
          margin-right: 0.5rem; margin-left:3%; max-height:60px; width:80%; display: none; ">
+    </a> --}}
+    <a href="{{ url('/') }}" class="brand-link">
+        <img src="{{ asset("/img/Mahalaxmilogo.png") }}" alt=" Municipality Logo"
+             class="brand-image img-circle elevation-3" style="opacity: .8">
+        <span class="brand-text font-weight-light ">
+            IMIS
+        </span>
     </a>
     @endif
     <div class="sidebar" style='overflow-y: scroll; font-family: Open Sans, sans-serif'>
@@ -71,6 +78,32 @@ Developed By: Innovative Solution Pvt. Ltd. (ISPL)   -->
                             </a>
                         </li>
                         @endcan
+
+                    </ul>
+                </li>
+                @endif
+                @if(Auth::user()->hasRole('Super Admin')|| Auth::user()->hasRole('Municipality - Super Admin'))
+                <li class="nav-item">
+                    <a href="#" class="nav-link {{-- {{ request()->is('building-info/*','layer-info/low-income-communities') ? 'active' : '' }} --}}">
+                        <img src="{{ asset('img/svg/imis-icons/buildingIMS.svg') }}" class="nav-icon" alt="Building Icon">
+                        <p>
+                            Education IMS<i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                       <li class="nav-item">
+                            <a href="{{ route('education.school.dashboard')}}" class="nav-link {{ request()->is('building-info/schools') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Education Dashboard</p>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="{{ route('education.school.index')}}" class="nav-link {{ request()->is('building-info/colleges') ? 'active' : '' }}">
+                                <i class="far fa-circle nav-icon"></i>
+                                <p>Schools</p>
+                            </a>
+                        </li>
 
                     </ul>
                 </li>

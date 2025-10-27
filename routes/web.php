@@ -10,6 +10,7 @@ use App\Http\Controllers\Fsm\ApplicationController;
 use App\Http\Controllers\Api\ApiServiceController;
 use App\Http\Controllers\MapsController;
 use App\Http\Controllers\Proxy\WMSProxyController;
+use App\Http\Controllers\Api\ViewMapController;
 
 /*
 |--------------------------------------------------------------------------
@@ -208,7 +209,7 @@ Route::group([
     Route::get('roadlines/export', 'RoadlineController@export');
     Route::get('roadlines/data', 'RoadlineController@getData');
     Route::get('roadlines/{code}/geometry', 'RoadlineController@getGeometry');
-    
+
     Route::get('roadlines/get-road-names', 'RoadlineController@getRoadNames')->name('roadlines.get-road-names');
     Route::get('roadlines/{id}/history', 'RoadlineController@history');
     Route::post('roadlines/add-road', 'RoadlineController@store');
@@ -516,7 +517,7 @@ Route::group(['middleware' => 'auth'], function () {
     // Route::post('maps/road-inaccessible-buildings', 'MapsController@roadInaccessibleBuildings');
     Route::get('maps/buildings-toilet-network', 'MapsController@getBuildingsToiletNetwork');
     Route::post('maps/get-kml-summary-info', 'MapsController@getKmlSummaryInfo') ;
-    
+
     Route::post('maps/check-geometry', 'MapsController@checkGeometry') ;
     Route::post('maps/get-kml-info-report-csv','MapsController@getKmlInfoReportCsv');
     Route::post('maps/containment-report', 'MapsController@getContainmentReport');
@@ -586,4 +587,30 @@ Route::group(['middleware' => ['auth']], function () {
      * Logout Routes
      */
     Route::post('/logout', 'Auth\LogoutController@perform')->name('logout.perform');
+});
+
+Route::get('/maps/show/', [ViewMapController::class, 'showMap'])->name('maps.show');
+
+
+
+/* Education Add School */
+Route::group([
+    'name' => 'education-info',
+    'prefix' => 'education-info',
+    'namespace' => 'EducationInfo',
+    'middleware' => 'auth'
+], function () {
+    Route::get('school', 'EducationController@index')->name('education.school.index');
+    Route::get('school/create', 'EducationController@create')->name('education.school.create');
+    Route::post('school/store', 'EducationController@store')->name('education.school.store');
+    Route::get('school/data', 'EducationController@getData')->name('education.school.data');
+
+
+    Route::get('school/show/{id}', 'EducationController@show')->name('education.school.show');
+    Route::get('school/{id}/edit', 'EducationController@edit')->name('education.school.edit');
+    Route::put('school/{id}', 'EducationController@update')->name('education.school.update');
+    Route::delete('school/{id}', 'EducationController@destroy')->name('education.school.delete');
+
+    Route::get('school/dashboard', 'EducationController@dashboard')->name('education.school.dashboard');
+
 });

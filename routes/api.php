@@ -10,6 +10,7 @@ use App\Http\Controllers\BuildingInfo\BuildingController;
 use App\Http\Controllers\BuildingSearchController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\ViewMapController;
 
 
 /*
@@ -33,7 +34,10 @@ use Illuminate\Support\Facades\Route;
 Route::get('get-Building-sewercode/{sewercode}',[BuildingSearchController::class,'getSewerCode']);
 Route::post('/login', [AuthController::class, 'login']);
 
-/*
+
+Route::post('/view-map/login', [ViewMapController::class, 'mapLogin']);
+
+/*-
 |
 | Protected API Routes ----------------------------------------------------
 |
@@ -147,4 +151,8 @@ Route::group([
 
         });
 
+    Route::post('/access-map', [ViewMapController::class, 'accessMap']);
+
 });
+
+Route::post('/verify-token', [ViewMapController::class, 'verifyToken']);
